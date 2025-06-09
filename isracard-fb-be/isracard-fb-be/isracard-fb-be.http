@@ -1,0 +1,6 @@
+@isracard_fb_be_HostAddress = http://localhost:5256
+
+GET {{isracard_fb_be_HostAddress}}/weatherforecast/
+Accept: application/json
+
+###

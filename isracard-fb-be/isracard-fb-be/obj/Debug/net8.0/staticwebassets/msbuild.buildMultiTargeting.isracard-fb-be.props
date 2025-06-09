@@ -1,0 +1,3 @@
+﻿<Project>
+  <Import Project="..\build\isracard-fb-be.props" />
+</Project>

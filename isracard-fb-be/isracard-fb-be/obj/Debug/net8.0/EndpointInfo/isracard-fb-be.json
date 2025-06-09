@@ -1,0 +1,159 @@
+{
+  "openapi": "3.0.1",
+  "info": {
+    "title": "isracard-fb-be",
+    "version": "1.0"
+  },
+  "paths": {
+    "/api/Flights": {
+      "get": {
+        "tags": [
+          "Flights"
+        ],
+        "parameters": [
+          {
+            "name": "status",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "destination",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      },
+      "post": {
+        "tags": [
+          "Flights"
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/FlightDto"
+              }
+            },
+            "text/json": {
+              "schema": {
+                "$ref": "#/components/schemas/FlightDto"
+              }
+            },
+            "application/*+json": {
+              "schema": {
+                "$ref": "#/components/schemas/FlightDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
+    },
+    "/api/Flights/{flightNumber}": {
+      "get": {
+        "tags": [
+          "Flights"
+        ],
+        "parameters": [
+          {
+            "name": "flightNumber",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
+    },
+    "/api/Flights/{id}": {
+      "delete": {
+        "tags": [
+          "Flights"
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "schemas": {
+      "FlightDto": {
+        "required": [
+          "departureTime",
+          "destination",
+          "flightNumber",
+          "gate"
+        ],
+        "type": "object",
+        "properties": {
+          "flightNumber": {
+            "maxLength": 6,
+            "minLength": 1,
+            "pattern": "^([A-Za-z]{2})(\\d{4})$",
+            "type": "string"
+          },
+          "destination": {
+            "minLength": 1,
+            "type": "string"
+          },
+          "departureTime": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "gate": {
+            "minLength": 1,
+            "pattern": "^([A-Za-z])(\\d)$",
+            "type": "string"
+          },
+          "status": {
+            "$ref": "#/components/schemas/FlightStatus"
+          }
+        },
+        "additionalProperties": false
+      },
+      "FlightStatus": {
+        "enum": [
+          0,
+          1,
+          2,
+          3,
+          4
+        ],
+        "type": "integer",
+        "format": "int32"
+      }
+    }
+  }
+}
