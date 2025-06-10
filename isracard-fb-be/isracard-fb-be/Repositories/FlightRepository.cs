@@ -17,6 +17,12 @@ public class FlightRepository : IFlightRepository
 
     public async Task AddAsync(Flight entity) => await _context.Flights.AddAsync(entity);
 
+    public Task UpdateAsync(Flight entity)
+    {
+        _context.Flights.Update(_context.Flights.FirstOrDefault(f => f.FlightNumber == entity.FlightNumber));
+        return Task.CompletedTask;
+    }
+
     public void Remove(Flight entity) => _context.Flights.Remove(entity);
 
     public async Task SaveChangesAsync() => await _context.SaveChangesAsync();

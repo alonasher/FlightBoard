@@ -6,11 +6,13 @@ using isracard_fb_be.Enums;
 public class FlightService : IFlightService
 {
     private readonly IFlightRepository _repo;
+    private readonly IFlightStatusService _flightStatusService;
     private readonly ILogger<FlightService> _logger;
 
-    public FlightService(IFlightRepository repo, ILogger<FlightService> logger)
+    public FlightService(IFlightRepository repo, IFlightStatusService flightStatusService, ILogger<FlightService> logger)
     {
         _repo = repo;
+        _flightStatusService = flightStatusService;
         _logger = logger;
     }
 
@@ -83,7 +85,11 @@ public class FlightService : IFlightService
             await _repo.AddAsync(flight);
             await _repo.SaveChangesAsync();
             _logger.LogInformation("Flight with number {FlightNumber} added successfully.", flightDto.FlightNumber);
-            return MapToDto(flight);
+
+            var addedFlightDto = MapToDto(flight);
+            await _flightStatusService.NotifyFlightAdded(addedFlightDto);
+
+            return addedFlightDto;
         }
         catch (DbUpdateException ex) when (ex.InnerException != null && ex.InnerException.Message.Contains("UNIQUE"))
         {
@@ -97,6 +103,33 @@ public class FlightService : IFlightService
         }
     }
 
+    public async Task UpdateFlightAsync(Flight flight)
+    {
+        try
+        {
+            if (flight == null)
+            {
+                _logger.LogWarning("Attempted to update a null flight.");
+                return;
+            }
+            if (flight.DepartureTime <= DateTime.UtcNow)
+            {
+                _logger.LogWarning("Attempted to update a flight with a departure time in the past or now: {DepartureTime}", flight.DepartureTime);
+                return;
+            }
+
+            await _repo.UpdateAsync(flight);
+            await _repo.SaveChangesAsync();
+            _logger.LogInformation("Flight with number {FlightNumber} updated successfully.", flight.FlightNumber);
+        }
+        catch (Exception e)
+        {
+            _logger.LogError("Error updating flight with number {FlightNumber}.", flight.FlightNumber);
+            return;
+        }
+        
+    }
+
     public async Task<bool> DeleteFlightAsync(string flightNumber)
     {
         try
@@ -107,6 +140,9 @@ public class FlightService : IFlightService
             _repo.Remove(flight);
             await _repo.SaveChangesAsync();
             _logger.LogInformation("Flight with ID {FlightId} deleted successfully.", flightNumber);
+
+            await _flightStatusService.NotifyFlightDeleted(flightNumber);
+
             return true;
         }
         catch (Exception ex)
@@ -162,14 +198,17 @@ public class FlightService : IFlightService
 
     public FlightStatus CalculateStatus(DateTime departureTime)
     {
-        var now = DateTime.UtcNow;
+        var now = DateTime.Now;
         var diff = (departureTime - now).TotalMinutes;
-        if (diff > 30) return FlightStatus.Scheduled;
-        if (diff > 10) return FlightStatus.Boarding;
-        if (diff >= -60) return FlightStatus.Departed;
-        if (diff < -60) return FlightStatus.Landed;
-        if (diff < -15) return FlightStatus.Delayed;
-        return FlightStatus.Scheduled;
+        if (diff > 30)
+            return FlightStatus.Scheduled;
+        if (diff > 10)
+            return FlightStatus.Boarding;
+        if (diff >= -15)
+            return FlightStatus.Departed;
+        if (diff >= -60)
+            return FlightStatus.Delayed;
+        return FlightStatus.Landed;
     }
 
     private FlightDto MapToDto(Flight flight)
@@ -185,7 +224,7 @@ public class FlightService : IFlightService
         };
     }
 
-    private Flight MapToEntity(FlightDto dto)
+    public Flight MapToEntity(FlightDto dto)
     {
         if (dto == null) return null;
         return new Flight

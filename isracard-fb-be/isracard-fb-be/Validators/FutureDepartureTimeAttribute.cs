@@ -3,9 +3,9 @@ using System.ComponentModel.DataAnnotations;
 
 public class FutureDepartureTimeAttribute : ValidationAttribute
 {
-    public int MinimumMinutesAhead { get; set; } = 60;
+    public int MinimumMinutesAhead { get; set; } = 10;
 
-    public FutureDepartureTimeAttribute() : base("Departure time must be at least one hour ahead.")
+    public FutureDepartureTimeAttribute() : base("Departure time must be at least 10 mins ahead.")
     {
     }
 
@@ -15,7 +15,7 @@ public class FutureDepartureTimeAttribute : ValidationAttribute
         {
             if (departureTime <= DateTime.UtcNow.AddMinutes(MinimumMinutesAhead))
             {
-                return new ValidationResult(ErrorMessage ?? $"Departure time must be at least {MinimumMinutesAhead / 60} hour(s) ahead.");
+                return new ValidationResult(ErrorMessage ?? $"Departure time must be at least {MinimumMinutesAhead} min(s) ahead.");
             }
         }
         return ValidationResult.Success;

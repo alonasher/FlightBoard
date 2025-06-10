@@ -1,9 +1,11 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 17
-VisualStudioVersion = 17.12.35707.178 d17.12
+VisualStudioVersion = 17.12.35707.178
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "isracard-fb-be", "isracard-fb-be\isracard-fb-be.csproj", "{497654F7-E753-474D-8BAA-1F0BB10B5C22}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "isracard_fb_be.Tests", "isracard_fb_be.Tests\isracard_fb_be.Tests.csproj", "{B34A322F-3CB8-46DE-B20A-908234BE88B6}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -15,6 +17,10 @@ Global
 		{497654F7-E753-474D-8BAA-1F0BB10B5C22}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{497654F7-E753-474D-8BAA-1F0BB10B5C22}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{497654F7-E753-474D-8BAA-1F0BB10B5C22}.Release|Any CPU.Build.0 = Release|Any CPU
+		{B34A322F-3CB8-46DE-B20A-908234BE88B6}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{B34A322F-3CB8-46DE-B20A-908234BE88B6}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{B34A322F-3CB8-46DE-B20A-908234BE88B6}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{B34A322F-3CB8-46DE-B20A-908234BE88B6}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

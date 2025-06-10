@@ -5,6 +5,7 @@
         Task<IEnumerable<Flight>> GetAllAsync();
         Task<Flight> GetByFlightNumberAsync(string flightNumber);
         Task AddAsync(Flight flight);
+        Task UpdateAsync(Flight flight);
         void Remove(Flight flight);
         Task SaveChangesAsync();
     }
