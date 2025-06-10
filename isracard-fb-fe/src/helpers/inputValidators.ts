@@ -27,9 +27,9 @@ export const validateDeparture = (departure: string) => {
   if (!departure) return "Departure time is required";
   const selected = new Date(departure);
   const now = new Date();
-  now.setHours(now.getHours() + 1);
+  now.setMinutes(now.getMinutes() + 10);
   if (selected < now) {
-    return "Departure time must be at least 1 hour from now";
+    return "Departure time must be at least 10 mins from now";
   }
   return null;
 };

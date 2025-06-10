@@ -1,0 +1,60 @@
+# .NET / ASP.NET Core
+bin/
+obj/
+*.user
+*.suo
+*.userosscache
+*.sln.docstates
+*.db-shm
+*.db-wal
+*.db-journal
+*.sqlite
+*.sqlite3
+
+# Visual Studio
+.vs/
+.vscode/
+*.code-workspace
+
+# Rider
+.idea/
+
+# ASP.NET Scaffolding
+ScaffoldingReadMe.txt
+
+# Logs
+*.log
+
+# npm / Node / React
+node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+package-lock.json
+yarn.lock
+
+# React build output
+build/
+dist/
+.env
+.env.*.local
+
+# OS generated files
+.DS_Store
+Thumbs.db
+
+# Test results
+TestResults/
+coverage/
+coverage-final.json
+lcov-report/
+
+# Misc
+*.tgz
+*.gz
+*.zip
+
+# Optional: Ignore local secrets
+secrets.json
+
+# End of file

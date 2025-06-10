@@ -4,8 +4,8 @@ import { FlightForm, FlightTable } from "../components";
 import { getFlights, addFlight, deleteFlight } from "../apis/flightsApi";
 import FlightFilter from "../components/flightFilter";
 import type { FlightFilterOptions } from "../interfaces/flightFilter";
-
-const TWO_MINS_IN_MS = 120000; // 2 minutes in milliseconds
+import { convertStatusCodeToStatus } from "../helpers/convertors";
+import { useFlightSignalR } from "../hooks/useFlightsSignalR";
 
 interface HomeProps {}
 
@@ -13,6 +13,7 @@ type FlightsAction =
   | { type: "SET_FLIGHTS"; payload: Flight[] }
   | { type: "ADD_FLIGHT"; payload: Flight }
   | { type: "DELETE_FLIGHT"; payload: string }
+  | { type: "UPDATE_FLIGHT_STATUS"; payload: {flightNumber : string,updatedStatus: FlightStatus} };
 
 const flightsReducer = (state: Flight[], action: FlightsAction): Flight[] => {
   switch (action.type) {
@@ -21,7 +22,13 @@ const flightsReducer = (state: Flight[], action: FlightsAction): Flight[] => {
     case "ADD_FLIGHT":
       return [...state, action.payload];
     case "DELETE_FLIGHT":
-      return state.filter((flight) => flight.flightNumber !== action.payload);     
+      return state.filter((flight) => flight.flightNumber !== action.payload);
+    case "UPDATE_FLIGHT_STATUS":
+      return state.map((flight) =>
+        flight.flightNumber === action.payload.flightNumber
+          ? { ...flight, status: action.payload.updatedStatus }
+          : flight
+      );
     default:
       return state;
   }
@@ -30,12 +37,19 @@ const flightsReducer = (state: Flight[], action: FlightsAction): Flight[] => {
 const Home = (props: HomeProps) => {
   const [flights, dispatch] = useReducer(flightsReducer, []);
   const [allFlights, setAllFlights] = useState<Flight[]>([]);
-  const [filter, setFilter] = useState<FlightFilterOptions>({status: "", destination: ""});
+  const [filter, setFilter] = useState<FlightFilterOptions>({
+    status: "",
+    destination: "",
+  });
 
+  useFlightSignalR(dispatch);
+
+  // Fetch all flights on mount
   useEffect(() => {
     const fetchAllFlights = async () => {
       const flightsData = await getFlights({});
       setAllFlights(flightsData);
+      dispatch({ type: "SET_FLIGHTS", payload: flightsData });
     };
     fetchAllFlights();
   }, []);
@@ -46,17 +60,13 @@ const Home = (props: HomeProps) => {
       dispatch({ type: "SET_FLIGHTS", payload: flightsData });
     };
 
-    fetchFlights(); // Initial fetch
-
-    const intervalId = setInterval(fetchFlights, TWO_MINS_IN_MS);
-
-    return () => clearInterval(intervalId); // Cleanup on unmount
+    fetchFlights();
   }, [filter]);
 
   // Handler for adding a flight
   const handleAddFlight = async (flightData: Flight) => {
     const created = await addFlight(flightData);
-    dispatch({ type: "ADD_FLIGHT", payload: created });
+    dispatch({ type: "ADD_FLIGHT", payload: {...created, status: convertStatusCodeToStatus(created.status.toString()), departureTime: new Date(created.departureTime).toLocaleString('he-IL', {})} });
   };
 
   // Handler for deleting a flight
@@ -74,7 +84,7 @@ const Home = (props: HomeProps) => {
     <div>
       <h1>Flight Management</h1>
       <FlightForm onAddFlight={handleAddFlight} />
-      <FlightFilter onFilterChange = {handleFilter} flights={allFlights}/>
+      <FlightFilter onFilterChange={handleFilter} flights={allFlights} />
       <FlightTable flights={flights} handleDeleteFlight={handleDeleteFlight} />
     </div>
   );

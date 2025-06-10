@@ -38,8 +38,8 @@ const FlightTable = (props: FlightTableProps) => {
           </TableRow>
         </TableHead>
         <TableBody>
-          {flights.map((flight, index) => (
-            <TableRow key={flight.flightNumber + index}>
+          {flights.map((flight) => (
+            <TableRow key={flight.flightNumber + flight.status}>
               <TableCell sx={upperCaseSx}>{flight.flightNumber.replace(/^([A-Za-z]{2})(\d{4})$/, "$1 $2")}</TableCell>
               <TableCell sx={upperCaseSx}>{flight.destination}</TableCell>
               <TableCell sx={upperCaseSx}>{flight.departureTime}</TableCell>

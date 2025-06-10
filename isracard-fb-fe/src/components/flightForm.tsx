@@ -48,7 +48,7 @@ const FlightForm = ({ onAddFlight }: FlightFormProps) => {
   // --- Utils ---
   const getMinDateTime = () => {
     const now = new Date();
-    now.setHours(now.getHours() + 1);
+    now.setMinutes(now.getMinutes() + 10);
     return now.toISOString().slice(0, 16);
   };
 
@@ -123,7 +123,7 @@ const FlightForm = ({ onAddFlight }: FlightFormProps) => {
     onAddFlight({
       flightNumber: cleanedFlightNumber,
       destination: cleanedDestination,
-      departureTime: new Date(departure).toISOString(),
+      departureTime: departure,
       status: "Scheduled",
       gate: cleanedGate,
     });
