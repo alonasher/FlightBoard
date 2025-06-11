@@ -19,14 +19,6 @@ public class FlightsController : ControllerBase
         return Ok(flights);
     }
 
-    [HttpGet("{flightNumber}")]
-    public async Task<IActionResult> Get(string flightNumber)
-    {
-        var flight = await _service.GetByFlightNumberAsync(flightNumber);
-        if (flight == null) return NotFound();
-        return Ok(flight);
-    }
-
     [HttpPost]
     public async Task<IActionResult> Post([FromBody] FlightDto flight)
     {
@@ -40,7 +32,7 @@ public class FlightsController : ControllerBase
             var created = await _service.AddFlightAsync(flight);
             return CreatedAtAction(nameof(Get), new { id = created.FlightNumber }, created);
         }
-        catch (ArgumentException ex)
+        catch (Exception ex)
         {
             return BadRequest(new { error = ex.Message });
         }

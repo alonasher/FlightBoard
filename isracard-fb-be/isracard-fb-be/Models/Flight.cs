@@ -10,7 +10,6 @@ public class Flight
     [MaxLength(6)]
     public string FlightNumber { get; set; }
 
-
     [Required]
     public string Destination { get; set; }
 

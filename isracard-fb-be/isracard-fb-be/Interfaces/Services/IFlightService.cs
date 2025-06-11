@@ -6,11 +6,9 @@ namespace isracard_fb_be.Interfaces.Services
     {
         Task<IEnumerable<FlightDto>> GetAllFlightsAsync();
 
-        Task<FlightDto> GetByFlightNumberAsync(string flightNumber);
-
         Task<FlightDto> AddFlightAsync(FlightDto flight);
         
-        Task UpdateFlightAsync(Flight flight);
+        Task UpdateFlightAsync(FlightDto flight);
 
         Task<bool> DeleteFlightAsync(string flightNumber);
 
@@ -19,7 +17,5 @@ namespace isracard_fb_be.Interfaces.Services
         Task SaveChangesAsync();
 
         FlightStatus CalculateStatus(DateTime departureTime);
-
-        Flight MapToEntity(FlightDto dto);
     }
 }

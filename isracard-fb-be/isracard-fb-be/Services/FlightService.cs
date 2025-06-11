@@ -2,6 +2,7 @@ using isracard_fb_be.Interfaces.Repositories;
 using isracard_fb_be.Interfaces.Services;
 using Microsoft.EntityFrameworkCore;
 using isracard_fb_be.Enums;
+using isracard_fb_be.Helpers;
 
 public class FlightService : IFlightService
 {
@@ -21,16 +22,8 @@ public class FlightService : IFlightService
         try
         {
             var flights = (await _repo.GetAllAsync()).ToList();
-            foreach (var flight in flights)
-            {
-                var newStatus = CalculateStatus(flight.DepartureTime);
-                if (flight.Status != newStatus)
-                {
-                    flight.Status = newStatus;
-                }
-            }
-            await _repo.SaveChangesAsync();
-            return flights.Select(MapToDto).ToList();
+
+            return flights.Select(FlightMappingService.MapToDto).ToList();
         }
         catch (Exception ex)
         {
@@ -39,54 +32,21 @@ public class FlightService : IFlightService
         }
     }
 
-    public async Task<FlightDto> GetByFlightNumberAsync(string flightNumber)
-    {
-        try
-        {
-            var flight = await _repo.GetByFlightNumberAsync(flightNumber);
-            if (flight != null)
-            {
-                var newStatus = CalculateStatus(flight.DepartureTime);
-                if (flight.Status != newStatus)
-                {
-                    flight.Status = newStatus;
-                    await _repo.SaveChangesAsync();
-                }
-                return MapToDto(flight);
-            }
-            return null;
-        }
-        catch (Exception ex)
-        {
-            _logger.LogError(ex, "Error retrieving flight with ID {FlightId}.", flightNumber);
-            return null;
-        }
-    }
-
     public async Task<FlightDto> AddFlightAsync(FlightDto flightDto)
     {
         try
         {
-            if (flightDto == null)
-            {
-                _logger.LogWarning("Attempted to add a null flight.");
+            if( !IsValidFlightDto(flightDto))
                 return null;
-            }
 
-            if (flightDto.DepartureTime <= DateTime.UtcNow)
-            {
-                _logger.LogWarning("Attempted to add a flight with a departure time in the past or now: {DepartureTime}", flightDto.DepartureTime);
-                return null;
-            }
-
-            var flight = MapToEntity(flightDto);
+            var flight = FlightMappingService.MapToEntity(flightDto);
             flight.Status = CalculateStatus(flight.DepartureTime);
 
             await _repo.AddAsync(flight);
             await _repo.SaveChangesAsync();
             _logger.LogInformation("Flight with number {FlightNumber} added successfully.", flightDto.FlightNumber);
 
-            var addedFlightDto = MapToDto(flight);
+            var addedFlightDto = FlightMappingService.MapToDto(flight);
             await _flightStatusService.NotifyFlightAdded(addedFlightDto);
 
             return addedFlightDto;
@@ -103,28 +63,22 @@ public class FlightService : IFlightService
         }
     }
 
-    public async Task UpdateFlightAsync(Flight flight)
+    public async Task UpdateFlightAsync(FlightDto flightDto)
     {
         try
         {
-            if (flight == null)
-            {
-                _logger.LogWarning("Attempted to update a null flight.");
+            if (!IsValidFlightDto(flightDto))
                 return;
-            }
-            if (flight.DepartureTime <= DateTime.UtcNow)
-            {
-                _logger.LogWarning("Attempted to update a flight with a departure time in the past or now: {DepartureTime}", flight.DepartureTime);
-                return;
-            }
+
+            var flight = FlightMappingService.MapToEntity(flightDto);
 
             await _repo.UpdateAsync(flight);
             await _repo.SaveChangesAsync();
-            _logger.LogInformation("Flight with number {FlightNumber} updated successfully.", flight.FlightNumber);
+            _logger.LogInformation("Flight with number {FlightNumber} updated successfully.", flightDto.FlightNumber);
         }
-        catch (Exception e)
+        catch (Exception)
         {
-            _logger.LogError("Error updating flight with number {FlightNumber}.", flight.FlightNumber);
+            _logger.LogError("Error updating flight with number {FlightNumber}.", flightDto.FlightNumber);
             return;
         }
         
@@ -174,7 +128,7 @@ public class FlightService : IFlightService
             if (!string.IsNullOrEmpty(status) && Enum.TryParse<FlightStatus>(status, out var statusEnum))
                 filtered = filtered.Where(f => f.Status == statusEnum).ToList();
 
-            return filtered.Select(MapToDto).ToList();
+            return filtered.Select(FlightMappingService.MapToDto).OrderBy(f => f.DepartureTime).ToList();
         }
         catch (Exception ex)
         {
@@ -211,29 +165,21 @@ public class FlightService : IFlightService
         return FlightStatus.Landed;
     }
 
-    private FlightDto MapToDto(Flight flight)
+    private bool IsValidFlightDto(FlightDto flightDto)
     {
-        if (flight == null) return null;
-        return new FlightDto
+        if (flightDto == null)
         {
-            FlightNumber = flight.FlightNumber,
-            Destination = flight.Destination,
-            DepartureTime = flight.DepartureTime,
-            Gate = flight.Gate,
-            Status = flight.Status
-        };
+            _logger.LogWarning("Attempted to add a null flight.");
+            return false;
+        }
+
+        if (flightDto.DepartureTime <= DateTime.UtcNow)
+        {
+            _logger.LogWarning("Attempted to add a flight with a departure time in the past or now: {DepartureTime}", flightDto.DepartureTime);
+            return false;
+        }
+
+        return true;
     }
 
-    public Flight MapToEntity(FlightDto dto)
-    {
-        if (dto == null) return null;
-        return new Flight
-        {
-            FlightNumber = dto.FlightNumber,
-            Destination = dto.Destination,
-            DepartureTime = dto.DepartureTime,
-            Gate = dto.Gate,
-            Status = dto.Status
-        };
-    }
 }

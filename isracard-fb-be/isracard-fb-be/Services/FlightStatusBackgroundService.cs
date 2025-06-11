@@ -5,11 +5,14 @@ using isracard_fb_be.Enums;
 public class FlightStatusBackgroundService : BackgroundService
 {
     private readonly IServiceProvider _serviceProvider;
-    private readonly TimeSpan _interval = TimeSpan.FromSeconds(15);
+    private readonly TimeSpan _interval = TimeSpan.FromSeconds(60);
+    private readonly ILogger<FlightStatusBackgroundService> _logger;
 
-    public FlightStatusBackgroundService(IServiceProvider serviceProvider)
+    public FlightStatusBackgroundService(IServiceProvider serviceProvider, ILogger<FlightStatusBackgroundService> logger)
     {
         _serviceProvider = serviceProvider;
+        _logger = logger;
+
     }
 
     protected override async Task ExecuteAsync(CancellationToken stoppingToken)
@@ -21,23 +24,33 @@ public class FlightStatusBackgroundService : BackgroundService
                 var flightStatusService = scope.ServiceProvider.GetRequiredService<IFlightStatusService>();
                 var flightService = scope.ServiceProvider.GetRequiredService<IFlightService>();
 
-                var flights = await flightService.GetAllFlightsAsync();
+                var flights = (await flightService.GetAllFlightsAsync()).ToList();
+                var updates = new List<FlightStatusUpdateDto>();
 
                 foreach (var flight in flights)
                 {
                     if (flight.Status == FlightStatus.Landed)
                         continue;
+
                     var newStatus = flightService.CalculateStatus(flight.DepartureTime);
 
                     if (flight.Status != newStatus)
                     {
-                        // Update the status in the data store
                         flight.Status = newStatus;
-                        await flightService.UpdateFlightAsync(flightService.MapToEntity(flight));
+                        await flightService.UpdateFlightAsync(flight);
 
-                        // Notify clients
-                        await flightStatusService.NotifyFlightStatusUpdated(flight.FlightNumber, newStatus.ToString());
+                        updates.Add(new FlightStatusUpdateDto
+                        {
+                            FlightNumber = flight.FlightNumber,
+                            Status = newStatus
+                        });
                     }
+                }
+
+                if (updates.Count > 0)
+                {
+                    _logger.LogInformation("Notifying clients of {UpdatesCount} flight status updates", updates.Count);
+                    await flightStatusService.NotifyFlightStatusUpdated(updates);
                 }
             }
 
