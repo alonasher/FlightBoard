@@ -32,7 +32,7 @@ This project features live updates via SignalR, flight filtering, and a responsi
 #### 1. Clone the repository
 
 ```bash
-git clone https://github.com/your-org/isracard-fb.git
+git clone https://github.com/alonasher/FlightBoard.git
 cd isracard-fb
 ```
 
