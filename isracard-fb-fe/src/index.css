@@ -46,9 +46,7 @@ button {
   cursor: pointer;
   transition: border-color 0.25s;
 }
-button:hover {
-  border-color: #646cff;
-}
+
 button:focus,
 button:focus-visible {
   outline: 4px auto -webkit-focus-ring-color;
@@ -65,4 +63,10 @@ button:focus-visible {
   button {
     background-color: #f9f9f9;
   }
+}
+
+@keyframes glow {
+  0% { box-shadow: 0 0 0px 0px #ffd700; }
+  50% { box-shadow: 0 0 16px 6px #ffd700; }
+  100% { box-shadow: 0 0 0px 0px #ffd700; }
 }

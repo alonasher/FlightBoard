@@ -1,4 +1,4 @@
-import React, { createContext, useContext, useEffect, useState, type PropsWithChildren } from "react";
+import { createContext, useContext, useEffect, useState, type PropsWithChildren } from "react";
 import { startConnection, stopConnection, getConnection } from "../services/flightSignalRService";
 import * as signalR from "@microsoft/signalr";
 

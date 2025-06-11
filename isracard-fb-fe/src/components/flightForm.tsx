@@ -8,11 +8,7 @@ import {
   validateFlightForm,
   validateGate,
 } from "../helpers/inputValidators";
-import {
-  destinationFormatter,
-  flightNumberFormatter,
-  formatField,
-} from "../helpers/inputFotmatters";
+import { destinationFormatter, flightNumberFormatter, formatField } from "../helpers/inputFotmatters";
 
 interface FlightFormProps {
   onAddFlight: (flight: Flight) => void;
@@ -38,12 +34,8 @@ const FlightForm = ({ onAddFlight }: FlightFormProps) => {
   const [destination, setDestination] = useState("");
   const [departure, setDeparture] = useState("");
   const [gate, setGate] = useState("");
-  const [errors, setErrors] = useState<{ [k: string]: string | null }>(
-    initialErrors
-  );
-  const [touched, setTouched] = useState<{ [k: string]: boolean }>(
-    initialTouched
-  );
+  const [errors, setErrors] = useState<{ [k: string]: string | null }>(initialErrors);
+  const [touched, setTouched] = useState<{ [k: string]: boolean }>(initialTouched);
 
   // --- Utils ---
   const getMinDateTime = () => {
@@ -99,20 +91,10 @@ const FlightForm = ({ onAddFlight }: FlightFormProps) => {
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
 
-    const validation = validateFlightForm({
-      flightNumber,
-      destination,
-      departure,
-      gate,
-    });
+    const validation = validateFlightForm({ flightNumber, destination, departure, gate });
 
     setErrors(validation);
-    setTouched({
-      flightNumber: true,
-      destination: true,
-      departure: true,
-      gate: true,
-    });
+    setTouched({ flightNumber: true, destination: true, departure: true, gate: true });
 
     if (Object.values(validation).some((err) => !!err)) return;
 
@@ -148,11 +130,7 @@ const FlightForm = ({ onAddFlight }: FlightFormProps) => {
 
   // --- Render ---
   return (
-    <Box
-      component="form"
-      onSubmit={handleSubmit}
-      sx={{ mb: 2, display: "flex", gap: 2 }}
-    >
+    <Box component="form" onSubmit={handleSubmit} sx={{ mb: 2, display: "flex", gap: 2 }}>
       <TextField
         label="Flight Number"
         value={flightNumber}

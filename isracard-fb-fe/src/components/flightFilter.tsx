@@ -54,18 +54,8 @@ const FlightFilter = (props: FlightFilterProps) => {
   };
 
   return (
-    <Box
-      onSubmit={handleOnSubmit}
-      component="form"
-      sx={{ mb: 2, display: "flex", gap: 2 }}
-    >
-      <Select
-        label="Status"
-        value={status}
-        onChange={handleStatusChange}
-        sx={{ minWidth: "140px" }}
-        displayEmpty
-      >
+    <Box onSubmit={handleOnSubmit} component="form" sx={{ mb: 2, display: "flex", gap: 2 }}>
+      <Select label="Status" value={status} onChange={handleStatusChange} sx={{ minWidth: "140px" }} displayEmpty>
         {flightStatusesDropdownData.map((option) => (
           <MenuItem key={option.value} value={option.value}>
             {option.label}
@@ -81,7 +71,7 @@ const FlightFilter = (props: FlightFilterProps) => {
       >
         <MenuItem value="">All</MenuItem>
         {destinations.map((dest) => (
-          <MenuItem key={dest} value={dest}>
+          <MenuItem key={dest} value={dest} sx={{ textTransform: "capitalize" }}>
             {dest}
           </MenuItem>
         ))}

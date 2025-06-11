@@ -5,11 +5,15 @@ export type FlightStatus =
   | "Landed"
   | "Delayed";
 
-
 export interface Flight {
   flightNumber: string;
   status: FlightStatus;
   destination: string;
   departureTime: string;
   gate: string;
+}
+
+export interface FlightStatusUpdate {
+  flightNumber: string;
+  status: FlightStatus;
 }

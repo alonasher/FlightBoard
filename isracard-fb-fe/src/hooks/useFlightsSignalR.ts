@@ -1,12 +1,8 @@
 import { useEffect } from "react";
-import type { Flight, FlightStatus } from "../interfaces/flight";
+import type { Flight, FlightStatusUpdate } from "../interfaces/flight";
 import { useSignalR } from "../context/signalRProvider";
 import { convertStatusCodeToStatus } from "../helpers/convertors";
-
-type FlightsAction =
-  | { type: "ADD_FLIGHT"; payload: Flight }
-  | { type: "DELETE_FLIGHT"; payload: string }
-  | { type: "UPDATE_FLIGHT_STATUS"; payload: { flightNumber: string; updatedStatus: FlightStatus } };
+import type { FlightsAction } from "../types/flightsAction";
 
 export const useFlightSignalR = (dispatch: React.Dispatch<FlightsAction>) => {
   const connection = useSignalR();
@@ -14,11 +10,17 @@ export const useFlightSignalR = (dispatch: React.Dispatch<FlightsAction>) => {
   useEffect(() => {
     if (!connection) return;
 
-    const handleStatusUpdate = (flightNumber: string, updatedStatus: FlightStatus) => {
-      dispatch({ type: "UPDATE_FLIGHT_STATUS", payload: { flightNumber, updatedStatus } });
+    const handleStatusUpdate = (updates: FlightStatusUpdate[]) => {
+      dispatch({
+        type: "BATCH_UPDATE_FLIGHT_STATUS",
+        payload: updates,
+      });
     };
     const handleFlightAdded = (flight: Flight) => {
-      flight.departureTime = new Date(flight.departureTime).toLocaleString('he-IL', {});
+      flight.departureTime = new Date(flight.departureTime).toLocaleString(
+        "he-IL",
+        {}
+      );
       flight.status = convertStatusCodeToStatus(flight.status.toString());
       dispatch({ type: "ADD_FLIGHT", payload: flight });
     };
