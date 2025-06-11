@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { Button, TextField, Box } from "@mui/material";
+import { Button, TextField, Box, styled } from "@mui/material";
 import type { Flight } from "../interfaces/flight";
 import {
   validateFlightNumber,
@@ -9,6 +9,46 @@ import {
   validateGate,
 } from "../helpers/inputValidators";
 import { destinationFormatter, flightNumberFormatter, formatField } from "../helpers/inputFotmatters";
+import { width } from "@mui/system";
+
+const StyledFormContainer = styled(Box)(({ theme }) => ({
+  display: "flex",
+  justifyContent: "center",
+  alignItems: "flex-start",
+  flexWrap: "wrap",
+  gap: theme.spacing(1),
+  minHeight: 85,
+  [theme.breakpoints.down("sm")]: {
+    flexDirection: "column",
+    alignItems: "stretch",
+  },
+}));
+
+const StyledTextField = styled(TextField)(({ theme }) => ({
+  minWidth: 215,
+  [theme.breakpoints.down(1250)]: {
+    width: "calc(50% - 12px)",
+    flex: "1 1 45%",
+  },
+  [theme.breakpoints.down("sm")]: {
+    width: "100%",
+    flexBasis: "100%",
+    minWidth: 0,
+  },
+}));
+
+const StyledButton = styled(Button)(({ theme }) => ({
+  height: 56,
+  maxWidth: 610,
+  minWidth: 150,
+  [theme.breakpoints.down(1250)]: {
+    flexGrow: 1,
+  },
+  [theme.breakpoints.down("sm")]: {
+    width: "100%",
+    flexBasis: "100%",
+  },
+}));
 
 interface FlightFormProps {
   onAddFlight: (flight: Flight) => void;
@@ -84,8 +124,9 @@ const FlightForm = ({ onAddFlight }: FlightFormProps) => {
       ...prev,
       [field]: true,
     }));
-    // Re-validate on blur
-    handleChange(field, eval(field));
+
+    const valueMap: Record<string, string> = { flightNumber, destination, departure, gate };
+    handleChange(field, valueMap[field]);
   };
 
   const handleSubmit = (e: React.FormEvent) => {
@@ -130,9 +171,10 @@ const FlightForm = ({ onAddFlight }: FlightFormProps) => {
 
   // --- Render ---
   return (
-    <Box component="form" onSubmit={handleSubmit} sx={{ mb: 2, display: "flex", gap: 2 }}>
-      <TextField
+    <StyledFormContainer onSubmit={handleSubmit}>
+      <StyledTextField
         label="Flight Number"
+        placeholder="e.g. LY1234"
         value={flightNumber}
         onChange={(e) => handleChange("flightNumber", e.target.value)}
         onBlur={() => handleBlur("flightNumber")}
@@ -140,8 +182,9 @@ const FlightForm = ({ onAddFlight }: FlightFormProps) => {
         error={!!errors.flightNumber && touched.flightNumber}
         helperText={touched.flightNumber ? errors.flightNumber : ""}
       />
-      <TextField
+      <StyledTextField
         label="Destination"
+        placeholder="e.g. Tel Aviv"
         value={destination}
         onChange={(e) => handleChange("destination", e.target.value)}
         onBlur={() => handleBlur("destination")}
@@ -149,9 +192,10 @@ const FlightForm = ({ onAddFlight }: FlightFormProps) => {
         error={!!errors.destination && touched.destination}
         helperText={touched.destination ? errors.destination : ""}
       />
-      <TextField
+      <StyledTextField
         label="Departure"
         type="datetime-local"
+        placeholder="Select date and time"
         value={departure}
         onChange={(e) => handleChange("departure", e.target.value)}
         onBlur={() => handleBlur("departure")}
@@ -167,8 +211,9 @@ const FlightForm = ({ onAddFlight }: FlightFormProps) => {
           },
         }}
       />
-      <TextField
+      <StyledTextField
         label="Gate"
+        placeholder="e.g. X3"
         value={gate}
         onChange={(e) => handleChange("gate", e.target.value)}
         onBlur={() => handleBlur("gate")}
@@ -176,10 +221,10 @@ const FlightForm = ({ onAddFlight }: FlightFormProps) => {
         error={!!errors.gate && touched.gate}
         helperText={touched.gate ? errors.gate : ""}
       />
-      <Button type="submit" variant="contained" disabled={!isFormValid}>
-        Add Flight
-      </Button>
-    </Box>
+      <StyledButton type="submit" variant="contained" disabled={!isFormValid}>
+        Add
+      </StyledButton>
+    </StyledFormContainer>
   );
 };
 

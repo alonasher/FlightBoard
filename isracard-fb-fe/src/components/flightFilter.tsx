@@ -7,7 +7,7 @@ const flightStatusesDropdownData: {
   value: FlightStatus | "";
   label: string;
 }[] = [
-  { value: "", label: "All" },
+  { value: "", label: "Status" },
   { value: "Boarding", label: "Boarding" },
   { value: "Delayed", label: "Delayed" },
   { value: "Departed", label: "Departed" },
@@ -55,21 +55,15 @@ const FlightFilter = (props: FlightFilterProps) => {
 
   return (
     <Box onSubmit={handleOnSubmit} component="form" sx={{ mb: 2, display: "flex", gap: 2 }}>
-      <Select label="Status" value={status} onChange={handleStatusChange} sx={{ minWidth: "140px" }} displayEmpty>
+      <Select value={status} onChange={handleStatusChange} sx={{ minWidth: "140px" }} displayEmpty>
         {flightStatusesDropdownData.map((option) => (
           <MenuItem key={option.value} value={option.value}>
             {option.label}
           </MenuItem>
         ))}
       </Select>
-      <Select
-        label="Destination"
-        value={destination}
-        onChange={handleDestinationChange}
-        sx={{ minWidth: "140px" }}
-        displayEmpty
-      >
-        <MenuItem value="">All</MenuItem>
+      <Select value={destination} onChange={handleDestinationChange} sx={{ minWidth: "140px" }} displayEmpty>
+        <MenuItem value="">Destination</MenuItem>
         {destinations.map((dest) => (
           <MenuItem key={dest} value={dest} sx={{ textTransform: "capitalize" }}>
             {dest}

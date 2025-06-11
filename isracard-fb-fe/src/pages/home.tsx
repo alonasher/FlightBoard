@@ -5,40 +5,40 @@ import { getFlights, addFlight, deleteFlight } from "../apis/flightsApi";
 import type { FlightFilterOptions } from "../interfaces/flightFilter";
 import { useFlightSignalR } from "../hooks/useFlightsSignalR";
 import type { FlightsAction } from "../types/flightsAction";
-import { convertStatusCodeToStatus } from "../helpers/convertors";
+import { flightsReducer } from "../services/flightsReducer";
+import { Box, styled, Typography } from "@mui/material";
+
+const StyledBoxContainer = styled(Box)(({ theme }) => ({
+  display: "flex",
+  flexDirection: "column",
+  alignItems: "center",
+  justifyContent: "center",
+  padding: theme.spacing(3),
+}));
+
+const StlyedTitle = styled(Typography)(({ theme }) => ({
+  marginBottom: theme.spacing(5),
+  fontWeight: 400,
+  transition: "font-size 0.3s ease-in-out",
+  [theme.breakpoints.down("md")]: {
+    fontSize: "4rem",
+    marginBottom: theme.spacing(3),
+  },
+  [theme.breakpoints.down("sm")]: {
+    fontSize: "2.5rem",
+    marginBottom: theme.spacing(3),
+  },
+}));
+
+const FormStyledBox = styled(Box)(({ theme }) => ({
+  display: "flex",
+  flexDirection: "column",
+  gap: theme.spacing(2),
+  marginBottom: theme.spacing(5),
+  width: "100%",
+}));
 
 interface HomeProps {}
-
-const flightsReducer = (state: Flight[], action: FlightsAction): Flight[] => {
-  switch (action.type) {
-    case "SET_FLIGHTS":
-      return action.payload;
-    case "ADD_FLIGHT":
-      return [...state, action.payload].sort(
-        (a, b) =>
-          new Date(a.departureTime).getTime() -
-          new Date(b.departureTime).getTime()
-      );
-    case "DELETE_FLIGHT":
-      return state.filter((flight) => flight.flightNumber !== action.payload);
-    case "BATCH_UPDATE_FLIGHT_STATUS":
-      return state.map((flight) => {
-        const update = action.payload.find(
-          (u) => u.flightNumber === flight.flightNumber
-        );
-        return update
-          ? {
-              ...flight,
-              status: convertStatusCodeToStatus(
-                update.status.toString()
-              ),
-            }
-          : flight;
-      });
-    default:
-      return state;
-  }
-};
 
 const Home = (props: HomeProps) => {
   const [flights, dispatch] = useReducer(flightsReducer, []);
@@ -47,15 +47,14 @@ const Home = (props: HomeProps) => {
     status: "",
     destination: "",
   });
-  const [lastAddedFlightNumber, setLastAddedFlightNumber] =
-    useState<string>("");
+  const [lastAddedFlightNumber, setLastAddedFlightNumber] = useState<string>("");
   const [refreshKey, setRefreshKey] = useState(0);
   const [glowingFlights, setGlowingFlights] = useState<string[]>([]);
 
   useFlightSignalR((action: FlightsAction) => {
     if (action.type === "BATCH_UPDATE_FLIGHT_STATUS") {
       setGlowingFlights(action.payload.map((u) => u.flightNumber));
-      setTimeout(() => setGlowingFlights([]), 700);
+      setTimeout(() => setGlowingFlights([]), 750);
     }
     dispatch(action);
   });
@@ -99,9 +98,11 @@ const Home = (props: HomeProps) => {
   };
 
   return (
-    <div>
-      <h1>Flight Management</h1>
-      <FlightForm onAddFlight={handleAddFlight} />
+    <StyledBoxContainer>
+      <StlyedTitle variant="h1">Flight Board</StlyedTitle>
+      <FormStyledBox>
+        <FlightForm onAddFlight={handleAddFlight} />
+      </FormStyledBox>
       <FlightFilter onFilterChange={handleFilter} flights={allFlights} />
       <FlightTable
         flights={flights}
@@ -109,7 +110,7 @@ const Home = (props: HomeProps) => {
         lastAddedFlightNumber={lastAddedFlightNumber}
         glowingFlights={glowingFlights}
       />
-    </div>
+    </StyledBoxContainer>
   );
 };
 
