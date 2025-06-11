@@ -65,14 +65,12 @@ const Home = (props: HomeProps) => {
 
   // Handler for adding a flight
   const handleAddFlight = async (flightData: Flight) => {
-    const created = await addFlight(flightData);
-    dispatch({ type: "ADD_FLIGHT", payload: {...created, status: convertStatusCodeToStatus(created.status.toString()), departureTime: new Date(created.departureTime).toLocaleString('he-IL', {})} });
+    await addFlight(flightData);
   };
 
   // Handler for deleting a flight
   const handleDeleteFlight = async (flightNumber: string) => {
     await deleteFlight(flightNumber);
-    dispatch({ type: "DELETE_FLIGHT", payload: flightNumber });
   };
 
   // Handler for filtering flights
