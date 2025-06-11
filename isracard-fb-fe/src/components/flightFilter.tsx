@@ -1,7 +1,35 @@
 import React, { useState, useMemo } from "react";
-import { Select, MenuItem, Button, Box } from "@mui/material";
+import { Select, MenuItem, Button, Box, styled } from "@mui/material";
 import type { FlightStatus, Flight } from "../interfaces/flight";
 import type { FlightFilterOptions } from "../interfaces/flightFilter";
+
+const StyledFilterBox = styled(Box)(({ theme }) => ({
+  width: "100%",
+  display: "flex",
+  flexWrap: "wrap",
+  justifyContent: "center",
+  gap: theme.spacing(1.5),
+  marginBottom: theme.spacing(2),
+  [theme.breakpoints.down("sm")]: {
+    flexDirection: "column",
+    alignItems: "stretch",
+    justifyContent: "center",
+  },
+}));
+
+const Row = styled(Box)(({ theme }) => ({
+  display: "flex",
+  justifyContent: "center",
+  gap: theme.spacing(2),
+  alignItems: "center",
+  [theme.breakpoints.down("sm")]: {
+    width: "100%",
+    ["& > *"]: {
+      width: "calc(50% - 12px)",
+      flex: "1 1 45%",
+    }
+  },
+}));
 
 const flightStatusesDropdownData: {
   value: FlightStatus | "";
@@ -54,29 +82,33 @@ const FlightFilter = (props: FlightFilterProps) => {
   };
 
   return (
-    <Box onSubmit={handleOnSubmit} component="form" sx={{ mb: 2, display: "flex", gap: 2 }}>
-      <Select value={status} onChange={handleStatusChange} sx={{ minWidth: "140px" }} displayEmpty>
-        {flightStatusesDropdownData.map((option) => (
-          <MenuItem key={option.value} value={option.value}>
-            {option.label}
-          </MenuItem>
-        ))}
-      </Select>
-      <Select value={destination} onChange={handleDestinationChange} sx={{ minWidth: "140px" }} displayEmpty>
-        <MenuItem value="">Destination</MenuItem>
-        {destinations.map((dest) => (
-          <MenuItem key={dest} value={dest} sx={{ textTransform: "capitalize" }}>
-            {dest}
-          </MenuItem>
-        ))}
-      </Select>
-      <Button type="submit" variant="contained">
-        Filter
-      </Button>
-      <Button type="button" variant="outlined" onClick={handleClear}>
-        Clear
-      </Button>
-    </Box>
+    <StyledFilterBox onSubmit={handleOnSubmit}>
+      <Row>
+        <Select value={status} onChange={handleStatusChange} sx={{ minWidth: "140px" }} displayEmpty>
+          {flightStatusesDropdownData.map((option) => (
+            <MenuItem key={option.value} value={option.value}>
+              {option.label}
+            </MenuItem>
+          ))}
+        </Select>
+        <Select value={destination} onChange={handleDestinationChange} sx={{ minWidth: "140px" }} displayEmpty>
+          <MenuItem value="">Destination</MenuItem>
+          {destinations.map((dest) => (
+            <MenuItem key={dest} value={dest} sx={{ textTransform: "capitalize" }}>
+              {dest}
+            </MenuItem>
+          ))}
+        </Select>
+      </Row>
+      <Row>
+        <Button variant="contained" onClick={handleOnSubmit} sx={{ minHeight: 56 }}>
+          Filter
+        </Button>
+        <Button type="button" variant="outlined" onClick={handleClear} sx={{ minHeight: 56 }}>
+          Clear
+        </Button>
+      </Row>
+    </StyledFilterBox>
   );
 };
 

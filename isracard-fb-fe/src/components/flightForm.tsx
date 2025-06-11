@@ -221,7 +221,7 @@ const FlightForm = ({ onAddFlight }: FlightFormProps) => {
         error={!!errors.gate && touched.gate}
         helperText={touched.gate ? errors.gate : ""}
       />
-      <StyledButton type="submit" variant="contained" disabled={!isFormValid}>
+      <StyledButton variant="contained" disabled={!isFormValid} onClick={handleSubmit}>
         Add
       </StyledButton>
     </StyledFormContainer>
