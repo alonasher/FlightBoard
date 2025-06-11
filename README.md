@@ -33,7 +33,7 @@ This project features live updates via SignalR, flight filtering, and a responsi
 
 ```bash
 git clone https://github.com/alonasher/FlightBoard.git
-cd isracard-fb
+cd FlightBoard
 ```
 
 #### 2. Install and run the **backend** (ASP.NET Core)
@@ -42,6 +42,7 @@ cd isracard-fb
 cd isracard-fb-be
 dotnet restore
 dotnet build
+cd isracard-fb-be
 dotnet run
 ```
 
