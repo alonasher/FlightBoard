@@ -1,4 +1,4 @@
-# Isracard Flight Board Frontend
+# Flight Board
 
 A React + TypeScript web application for managing and displaying flight information in real time.  
 This project features live updates via SignalR, flight filtering, and a responsive UI built with Material-UI.
